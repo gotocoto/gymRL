@@ -1,37 +1,31 @@
 import gymnasium as gym
 import numpy as np
 
-'''
-observation, info = env.reset()
-for _ in range(50):
-action = env.action_space.sample() # agent policy that uses the observation and info
-observation, reward, terminated, truncated, info = env.step(action)
-if terminated or truncated:
-observation, info = env.reset()
-env.close()
-'''
-
-
 def run_BJack_Q():
     # Start Q-learning code
     env = gym.make("Blackjack-v1", natural=False, sab=False)  # Initializing environments
-    observation, info = env.reset()
+    observation1, info = env.reset()
     terminated = False  # Will be true if we win Blackjack
     truncated = False  # Will be true when the "Actions" threshold is met
-    q_table = np.random.uniform(low=0, high=1)
 
-    while (not terminated and not truncated):
-        for _ in range(200):
-            action = env.action_space.sample()  # Blackjack actions: Take a card, or no.
-            observation, reward, terminated, truncated, info = env.step(action)
-            state = observation
-            print(state)
-            env.render()
+    #q_table = np.zeros((env.observation_space[0].n,  env.action_space[0].n))
+    q_table = np.zeros((32, 32, 2))
+    alpha = 0.1
+
+
+
+    while not terminated and not truncated:
+        for _ in range(1000):
+            #implement q-learning
+            action = env.action_space.sample() # Blackjack actions: Take a card, or no.
+            #action = np.argmax(q_table[state])
+            state, reward, terminated, truncated, info = env.step(action)
+            #q_table[state, action] += (reward + np.max([q_table[state]]) - q_table[state, action])
+            q_table[state, action] += (1-alpha)*(q_table[state,action]) + alpha*reward
             if terminated or truncated:
-                observation, info = env.reset()
-
+                observation2, info = env.reset()
     env.close()
-
+    print(q_table)
     # End Q-learning code
 
 
